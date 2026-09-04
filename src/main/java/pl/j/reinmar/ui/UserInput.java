@@ -85,7 +85,18 @@ public class UserInput {
         String name = sc.nextLine().trim();
         String finalName = name.isEmpty() ? defaultFileName : name;
 
+        // Jeśli użytkownik nie podał rozszerzenia, użyj wartości domyślnej
+        if (!name.isEmpty() && !hasValidExtension(finalName)) {
+            finalName = defaultFileName;
+        }
+
         // automatyczny katalog output/
         return Path.of("output", finalName);
+    }
+
+    private boolean hasValidExtension(String fileName) {
+        String lower = fileName.toLowerCase(Locale.ROOT);
+        return lower.endsWith(".csv") || lower.endsWith(".txt") ||
+                lower.endsWith(".json") || lower.endsWith(".xml");
     }
 }
