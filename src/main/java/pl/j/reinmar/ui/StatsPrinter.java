@@ -44,7 +44,7 @@ public class StatsPrinter {
             );
 
             System.out.println("=== TOP " + topN + " słów — sortowanie: " + sortMode + " ===");
-            top.forEach(wc -> System.out.printf("%-20s : %d%n", wc.word(), wc.count()));
+            top.forEach(wc -> System.out.printf(wc.word() + " : " + wc.count()) );
 
         } catch (Exception e) {
             System.err.println("❌ Błąd odczytu pliku: " + e.getMessage());
@@ -74,7 +74,7 @@ public class StatsPrinter {
             System.out.println("=== Częstotliwości (pierwsze " + limit + ") ===");
             for (int i = 0; i < limit; i++) {
                 var e = sorted.get(i);
-                System.out.printf("%-20s : %d%n", e.getKey(), e.getValue());
+                System.out.printf(e.getKey() + " : " + e.getValue());
             }
 
             if (sorted.size() > limit) {
