@@ -26,8 +26,8 @@ public class SaveFullReportAction implements MenuAction {
 
     @Override
     public void execute() {
-        Path output = input.askOutputPath("full_report.txt");
         ReportWriter.Format format = input.askReportFormat();
+        Path output = input.askOutputPath("full_report.txt", format);
         WordSort sort = input.askSortMode();
         saver.saveReport(output, path, ReportType.FULL, settings.getStopWords(),
                 settings.getMinWordLength(), sort, 0, format);
