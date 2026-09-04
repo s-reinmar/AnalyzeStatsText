@@ -62,17 +62,16 @@ public class TextAnalyzer {
     public Map<String, Integer> wordFrequencyFromText(String text,
                                                       Set<String> stopWords,
                                                       int minWordLength) {
-        String normalized = normalizer.normalize(Objects.requireNonNullElse(text, ""));
-        List<String> words = tokenizer.words(normalized);
+        return tokenizer.words(normalizer.normalize(Objects.requireNonNullElse(text, "")))
+                .stream()
+                .filter(w -> (stopWords == null || !stopWords.contains(w)))
+                .filter(w -> w.length() >= Math.max(1, minWordLength))
+                .collect(Collectors.toMap(
+                        w -> w,
+                        w -> 1,
+                        Integer::sum
+                ));
 
-        Map<String, Integer> freq = new HashMap<>();
-        for (String w : words) {
-            if ((stopWords == null || !stopWords.contains(w))
-                    && w.length() >= Math.max(1, minWordLength)) {
-                freq.merge(w, 1, Integer::sum);
-            }
-        }
-        return freq;
     }
 
     /**
@@ -81,29 +80,8 @@ public class TextAnalyzer {
     public Map<String, Integer> wordFrequencyFromFile(String path,
                                                       Set<String> stopWords,
                                                       int minWordLength) throws IOException {
-        String content = FileReader.readResource(path);
-        return wordFrequencyFromText(content, stopWords, minWordLength);
+        return wordFrequencyFromText(FileReader.readResource(path), stopWords, minWordLength);
     }
-
-    /**
-     * Zwraca listę top N słów posortowaną po liczbie wystąpień malejąco, przy remisie alfabetycznie.
-     */
-    public List<WordCount> topWordsFromText(String text,
-                                            int topN,
-                                            Set<String> stopWords,
-                                            int minWordLength) {
-        return topWordsFromText(text, topN, stopWords, minWordLength, WordSort.FREQUENCY_DESC);
-    }
-
-    public List<WordCount> topWordsFromFile(String path,
-                                            int topN,
-                                            Set<String> stopWords,
-                                            int minWordLength) throws IOException {
-        String content = FileReader.readResource(path);
-        return topWordsFromText(content, topN, stopWords, minWordLength);
-    }
-
-    // ====== NOWE: wersje ze strategią sortowania (ENUM) ======
 
     /**
      * Zwraca listę słów posortowaną zgodnie z WordSort; limit topN (min. 1).
@@ -122,6 +100,15 @@ public class TextAnalyzer {
                 .collect(Collectors.toList());
     }
 
+    public List<WordCount> topWordsFromFile(String path,
+                                            int topN,
+                                            Set<String> stopWords,
+                                            int minWordLength,
+                                            WordSort sortMode) throws IOException {
+        String content = FileReader.readResource(path);
+        return topWordsFromText(content, topN, stopWords, minWordLength, sortMode);
+    }
+
 
     /**
      * Pełna lista posortowana wg WordSort (bez limitu).
@@ -136,15 +123,6 @@ public class TextAnalyzer {
                 .map(e -> new WordCount(e.getKey(), e.getValue()))
                 .sorted(sortMode.comparator())
                 .collect(Collectors.toList());
-    }
-
-    public List<WordCount> topWordsFromFile(String path,
-                                            int topN,
-                                            Set<String> stopWords,
-                                            int minWordLength,
-                                            WordSort sortMode) throws IOException {
-        String content = FileReader.readResource(path);
-        return topWordsFromText(content, topN, stopWords, minWordLength, sortMode);
     }
 
     /**
