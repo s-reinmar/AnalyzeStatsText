@@ -1,22 +1,25 @@
 package pl.j.reinmar.app;
 
-import pl.j.reinmar.io.FileReader;
-
-import static pl.j.reinmar.app.TextMethod.*;
+import pl.j.reinmar.core.DefaultNormalizer;
+import pl.j.reinmar.core.TextAnalyzer;
+import pl.j.reinmar.core.WhitespaceTokenizer;
+import pl.j.reinmar.model.TextStats;
 
 public class TextApp {
-
     public static void main(String[] args) {
+        // jeśli implementacje są publiczne:
+        TextAnalyzer analyzer = new TextAnalyzer(new DefaultNormalizer(), new WhitespaceTokenizer());
 
-        // wykorzystanie funkcji czytania z plików zasobów Resource
-        String text = FileReader.readResource("file.txt");
+        // analiza stringa
+        TextStats stats = analyzer.analyze("To jest przykładowe zdanie.");
+        System.out.println(stats);
 
-
-        System.out.println("=== Zawartość pliku ===");
-
-        System.out.println("Słowa: " + countWords(text));
-        System.out.println("Znaki (ze spacjami): " + countCharsWithSpaces(text));
-        System.out.println("Znaki (bez spacji): " + countCharsWithoutSpaces(text));
-
+        // analiza pliku z resources (obsługa IOException)
+        try {
+            TextStats fileStats = analyzer.analyzeFile("file.txt"); // ścieżka w resources
+            System.out.println(fileStats);
+        } catch (Exception e) {
+            System.err.println("Błąd podczas czytania zasobu: " + e.getMessage());
+        }
     }
 }
