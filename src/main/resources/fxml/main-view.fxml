@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="pl.j.reinmar.app.FxController"
+            prefWidth="900" prefHeight="600">
+    <top>
+        <HBox spacing="8" style="-fx-padding: 10;">
+            <Label text="Plik bazowy (bez .txt):"/>
+            <TextField fx:id="baseNameField" promptText="np. file"/>
+            <Button text="Załaduj" onAction="#onLoadFile"/>
+            <Label fx:id="statusLabel" text="Gotowe"/>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="8" style="-fx-padding: 10; -fx-pref-width: 260;">
+            <Label text="Opcje (jak menu):"/>
+            <ListView fx:id="menuList"/>
+            <Button text="Wykonaj" onAction="#onExecuteSelected"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox style="-fx-padding: 10;" spacing="8" BorderPane.alignment="TOP_LEFT">
+            <Label text="Log / wynik:"/>
+            <TextArea fx:id="logArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+</BorderPane>

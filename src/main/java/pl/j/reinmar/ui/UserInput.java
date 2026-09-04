@@ -63,6 +63,10 @@ public class UserInput {
 
     // ===================== SORTOWANIE =====================
 
+    /***
+     * Pobiera od użytkownika preferowany sposób sortowania słów. Jeśli użytkownik nie poda poprawnej opcji, zostanie użyta wartość domyślna (częstotliwość malejąco).
+     * @return
+     */
     public WordSort askSortMode() {
         System.out.println("""
             Wybierz sortowanie:
@@ -87,6 +91,11 @@ public class UserInput {
 
     // ===================== ŚCIEŻKI =====================
 
+    /***
+     * Pobiera od użytkownika nazwę pliku wyjściowego, z opcją domyślną. Jeśli użytkownik nie poda rozszerzenia, zostanie użyta wartość domyślna.
+     * @param defaultFileName
+     * @return
+     */
     public Path askOutputPath(String defaultFileName) {
         System.out.print("Podaj nazwę pliku wyjściowego (ENTER = " + defaultFileName + "): ");
         String name = sc.nextLine().trim();
