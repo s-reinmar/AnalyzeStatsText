@@ -3,6 +3,7 @@ package pl.j.reinmar.app;
 import pl.j.reinmar.core.TextAnalyzer;
 import pl.j.reinmar.model.TextStats;
 import pl.j.reinmar.model.WordCount;
+import pl.j.reinmar.model.WordSort;
 
 import pl.j.reinmar.io.ReportWriter;
 import pl.j.reinmar.io.ReportWriter.Format; // wewn. enum
@@ -76,14 +77,16 @@ public class TextMenu {
     private void showTopWords() {
         System.out.print("Podaj N (ile najczęstszych słów pokazać): ");
         int topN = parsePositiveInt(sc.nextLine(), 20);
+        WordSort sortMode = askSortMode();
         try {
             List<WordCount> top = analyzer.topWordsFromFile(
                     path,
                     topN,
                     stopWordsEnabled() ? stopWords : null,
-                    minWordLength
+                    minWordLength,
+                    sortMode
             );
-            System.out.println("=== TOP " + topN + " słów ===");
+            System.out.println("=== TOP " + topN + " słów — sortowanie: " + sortMode + " ===");
             for (WordCount wc : top) {
                 System.out.printf("%-20s : %d%n", wc.word(), wc.count());
             }
@@ -224,7 +227,22 @@ public class TextMenu {
         };
     }
 
-    private java.nio.file.Path askOutputPath(String defaultFileName) {
+    //ask sort mode, zapytanie o typ sortowania // new
+    private WordSort askSortMode() {
+        System.out.print("Wybierz sortowanie (alpha / freq-desc / freq-asc): ");
+        String s = sc.nextLine().trim().toLowerCase(Locale.ROOT);
+        return switch (s) {
+            case "alpha", "alf", "alphabetic", "alfabetycznie" -> WordSort.ALPHABETIC;
+            case "freq-desc", "desc", "malejąco" -> WordSort.FREQUENCY_DESC;
+            case "freq-asc", "asc", "rosnąco" -> WordSort.FREQUENCY_ASC;
+            default -> {
+                System.out.println("Nieznany tryb, domyślnie: freq-desc (malejąco po liczbie wystąpień).");
+                yield WordSort.FREQUENCY_DESC;
+            }
+        };
+    }
+
+    private Path askOutputPath(String defaultFileName) {
         System.out.print("Podaj nazwę pliku wyjściowego (ENTER = " + defaultFileName + "): ");
         String name = sc.nextLine().trim();
         String finalName = name.isEmpty() ? defaultFileName : name;
