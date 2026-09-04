@@ -1,4 +1,6 @@
-package pl.j.reinmar.app;
+package com.cohenm.analyzer.app;
+
+import java.util.ArrayList;
 
 public class TextApp {
 
@@ -15,7 +17,15 @@ public class TextApp {
 
         trimmed = trimmed.replaceAll("[\\p{Punct}„”»«]", " ");
         String[] parts = trimmed.split("\\s+");
-        return parts.length;
+
+        // przenoszenie do ArrayList
+        ArrayList<String> words = new ArrayList<String>();
+        for (String part : parts) {
+            if(!part.isBlank()) {
+                words.add(part);
+            }
+        }
+        return words.size();
     }
 
     /**
