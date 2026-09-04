@@ -142,6 +142,9 @@ public class FxController {
             return;
         }
 
+        // Każde uruchomienie opcji zaczyna z czystym obszarem wynikowym.
+        logArea.clear();
+
         try {
             selected.execute();
             statusLabel.setText("Wykonano: " + selected.label());
