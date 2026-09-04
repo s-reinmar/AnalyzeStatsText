@@ -5,7 +5,8 @@ import pl.j.reinmar.model.TextStats;
 import java.util.Map;
 
 public interface Formatter {
-    String basic(TextStats textStats);
-    String full(TextStats textStats, Map<String, Integer> freq);
-    String frequency(Map<String, Integer> freq);
+    String formatBasic(TextStats stats);
+    String formatFull(TextStats stats, Map<String,Integer> freq);
+    String formatFrequency(Map<String,Integer> freq);
+
 }

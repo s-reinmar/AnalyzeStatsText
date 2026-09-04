@@ -1,12 +1,14 @@
 package pl.j.reinmar.app;
 
 import pl.j.reinmar.core.TextAnalyzer;
-import pl.j.reinmar.model.WordCount;
 import pl.j.reinmar.model.WordSort;
 import pl.j.reinmar.ui.UserInput;
 import pl.j.reinmar.ui.StatsPrinter;
 import pl.j.reinmar.ui.ReportSaver;
+import pl.j.reinmar.io.ReportWriter;
+import pl.j.reinmar.io.builder.ReportType;
 
+import java.nio.file.Path;
 import java.util.*;
 
 public class TextMenu {
@@ -31,7 +33,7 @@ public class TextMenu {
         this.path = path;
         this.input = new UserInput(sc);
         this.printer = new StatsPrinter();
-        this.saver = new ReportSaver(analyzer, input);
+        this.saver = new ReportSaver(analyzer);
     }
 
     // ===================== MENU =====================
@@ -40,36 +42,39 @@ public class TextMenu {
         while (true) {
             printMenu();
             switch (input.readLine().trim()) {
-                case "1" -> printer.printBasic(analyzer, path);
+                case "1" -> printer.printBasicStats(analyzer, path);
                 case "2" -> showTopWords();
-                case "3" -> printer.printFrequencyFragment(analyzer, path, stopWords, minWordLength);
+                case "3" -> printer.printFrequencyPreview(analyzer, path, stopWords, minWordLength, WordSort.FREQUENCY_DESC);
                 case "4" -> minWordLength = input.askMinWordLength(minWordLength);
                 case "5" -> toggleStopWords();
-                case "6" -> saver.saveBasic(path, stopWords, minWordLength);
-                case "7" -> saver.saveFull(path, stopWords, minWordLength);
-                case "8" -> saver.saveFrequency(path, stopWords, minWordLength);
-                case "0" -> { System.out.println("Koniec. Do zobaczenia!"); return; }
+                case "6" -> saveReport(ReportType.BASIC);
+                case "7" -> saveReport(ReportType.FULL);
+                case "8" -> saveReport(ReportType.FREQUENCY);
+                case "0" -> {
+                    System.out.println("Koniec. Do zobaczenia!");
+                    return;
+                }
                 default -> System.out.println("Nieznana opcja.");
             }
         }
     }
-
 
     // ===================== LOGIKA OPCJI =====================
 
     private void showTopWords() {
         int n = input.askInt("Podaj N", 20);
         WordSort sort = input.askSortMode();
-        printer.printTop(analyzer, path, n, stopWords, minWordLength, sort);
+        printer.printTopWords(analyzer, path, n, stopWords, minWordLength, sort);
     }
-
 
     private void toggleStopWords() {
         if (stopWords.isEmpty()) {
-            stopWords.addAll(List.of("i","oraz","że","to","w","na","z","do","się","jest","nie","a","o","po","u",
+            stopWords.addAll(List.of(
+                    "i","oraz","że","to","w","na","z","do","się","jest","nie","a","o","po","u",
                     "ten","ta","to","jak","który","która","które","te","dla","przy","albo","lub",
                     "czy","tam","tu","nad","pod","od","bez","więc","co","tak","tylko","mnie",
-                    "ciebie","jego","jej","ich"));
+                    "ciebie","jego","jej","ich"
+            ));
             System.out.println("Stop‑words: WŁĄCZONE");
         } else {
             stopWords.clear();
@@ -77,9 +82,22 @@ public class TextMenu {
         }
     }
 
+    private void saveReport(ReportType type) {
+        Path output = input.askOutputPath("Podaj ścieżkę wyjściową");
+        ReportWriter.Format format = input.askReportFormat();
+        WordSort sort = input.askSortMode();
+        int topN = input.askInt("Podaj N (dla TOP, ignorowane dla innych)", 20);
 
-    private boolean stopWordsEnabled() {
-        return !stopWords.isEmpty();
+        saver.saveReport(
+                output,
+                path,
+                type,
+                stopWords,
+                minWordLength,
+                sort,
+                topN,
+                format
+        );
     }
 
     private void printMenu() {

@@ -1,99 +1,77 @@
 package pl.j.reinmar.ui;
 
 import pl.j.reinmar.core.TextAnalyzer;
+import pl.j.reinmar.core.WordAnalysisMode;
 import pl.j.reinmar.io.ReportWriter;
+import pl.j.reinmar.io.builder.ReportBuilder;
+import pl.j.reinmar.io.builder.ReportType;
 import pl.j.reinmar.model.TextStats;
+import pl.j.reinmar.model.WordSort;
 
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Klasa odpowiedzialna za orkiestrację procesu tworzenia raportów:
+ * - pobiera dane z TextAnalyzer,
+ * - deleguje budowanie treści do ReportBuilder,
+ * - deleguje zapis do ReportWriter.
+ */
 public class ReportSaver {
 
     private final TextAnalyzer analyzer;
-    private final UserInput input;
 
-    public ReportSaver(TextAnalyzer analyzer, UserInput input) {
+    public ReportSaver(TextAnalyzer analyzer) {
         this.analyzer = analyzer;
-        this.input = input;
     }
 
-    // ===================== PUBLICZNE METODY ZAPISU =====================
+    /**
+     * Tworzy i zapisuje raport do pliku.
+     *
+     * @param outputPath   ścieżka docelowa
+     * @param inputPath    ścieżka do pliku wejściowego
+     * @param type         typ raportu (BASIC, FULL, FREQUENCY)
+     * @param stopWords    zbiór stop-words
+     * @param minWordLength minimalna długość słowa
+     * @param sortMode     tryb sortowania słów
+     * @param topN         liczba słów dla TOP_WORDS (ignorowane dla innych typów)
+     * @param format       format raportu (CSV, TXT, JSON, XML)
+     */
+    public void saveReport(Path outputPath,
+                           String inputPath,
+                           ReportType type,
+                           Set<String> stopWords,
+                           int minWordLength,
+                           WordSort sortMode,
+                           int topN,
+                           ReportWriter.Format format) {
 
-    public void saveBasic(String path, Set<String> stopWords, int minWordLength) {
-        ReportWriter.Format format = input.askFormat();
-        Path out = input.askOutputPath(defaultName(path, "basic_stats", format));
-
-        saveReport(out, () -> {
-            TextStats stats = analyzer.analyzeFile(path);
-            ReportWriter.writeBasicStats(stats, out, format);
-        });
-    }
-
-    public void saveFull(String path, Set<String> stopWords, int minWordLength) {
-        ReportWriter.Format format = input.askFormat();
-        Path out = input.askOutputPath(defaultName(path, "full_stats", format));
-
-        saveReport(out, () -> {
-            TextStats stats = analyzer.analyzeFile(path);
-            Map<String,Integer> freq = analyzer.wordFrequencyFromFile(
-                    path,
-                    stopWords != null && !stopWords.isEmpty() ? stopWords : null,
-                    minWordLength
-            );
-            ReportWriter.writeFullStats(stats, freq, out, format);
-        });
-    }
-
-    public void saveFrequency(String path, Set<String> stopWords, int minWordLength) {
-        ReportWriter.Format format = input.askFormat();
-        Path out = input.askOutputPath(defaultName(path, "word_frequency", format));
-
-        saveReport(out, () -> {
-            Map<String,Integer> freq = analyzer.wordFrequencyFromFile(
-                    path,
-                    stopWords != null && !stopWords.isEmpty() ? stopWords : null,
-                    minWordLength
-            );
-            ReportWriter.writeWordFrequency(freq, out, format);
-        });
-    }
-
-    // ===================== WSPÓLNY MECHANIZM ZAPISU =====================
-
-    @FunctionalInterface
-    private interface IOAction {
-        void run() throws Exception;
-    }
-
-    private void saveReport(Path out, IOAction action) {
         try {
-            action.run();
-            System.out.println("Zapisano: " + out.toAbsolutePath());
+            // 1. Statystyki
+            TextStats stats = analyzer.analyzeFile(inputPath);
+
+            // 2. Częstotliwości słów (zawsze potrzebne)
+            @SuppressWarnings("unchecked")
+            Map<String, Integer> freq = (Map<String, Integer>) analyzer.analyzeWordsFromFile(
+                    inputPath,
+                    stopWords,
+                    minWordLength,
+                    sortMode,
+                    topN,
+                    WordAnalysisMode.FREQUENCY_MAP
+            );
+
+            // 3. Budowanie treści raportu
+            String content = ReportBuilder.build(type, stats, freq, ReportWriter.formatter(format));
+
+            // 4. Zapis do pliku
+            ReportWriter.write(outputPath, content);
+
+            System.out.println("✔ Raport zapisany: " + outputPath);
+
         } catch (Exception e) {
-            System.err.println("Błąd zapisu: " + e.getMessage());
+            System.err.println("❌ Błąd zapisu raportu: " + e.getMessage());
         }
-    }
-
-    // ===================== GENEROWANIE NAZW PLIKÓW =====================
-
-    private String defaultName(String inputPath, String base, ReportWriter.Format f) {
-        String ext = switch (f) {
-            case CSV -> "csv";
-            case TXT -> "txt";
-            case JSON -> "json";
-            case XML -> "xml";
-        };
-
-        String stem = stripTxtSuffix(inputPath);
-        return stem + "-" + base + "." + ext;
-    }
-
-    private String stripTxtSuffix(String p) {
-        if (p != null && p.toLowerCase(Locale.ROOT).endsWith(".txt")) {
-            return p.substring(0, p.length() - 4);
-        }
-        return p;
     }
 }
