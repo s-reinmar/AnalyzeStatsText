@@ -1,0 +1,16 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AnalyzeStatsText:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AnalyzeStatsText_jar</output-path>
+    <root id="archive" name="AnalyzeStatsText.jar">
+      <element id="module-output" name="AnalyzeStatsText" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/22.0.2/javafx-controls-22.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/22.0.2/javafx-fxml-22.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/22.0.2/javafx-base-22.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/22.0.2/javafx-graphics-22.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/22.0.2/javafx-base-22.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/22.0.2/javafx-fxml-22.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/22.0.2/javafx-controls-22.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/22.0.2/javafx-graphics-22.0.2-win.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
