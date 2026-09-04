@@ -2,7 +2,6 @@ package pl.j.reinmar.app;
 
 import pl.j.reinmar.core.*;
 import pl.j.reinmar.model.*;
-
 import java.util.*;
 
 public class TextApp {

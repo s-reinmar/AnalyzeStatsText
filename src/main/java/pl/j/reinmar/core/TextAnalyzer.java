@@ -4,7 +4,8 @@ import pl.j.reinmar.io.FileReader;
 import pl.j.reinmar.model.TextStats;
 import pl.j.reinmar.model.WordCount;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.*; // Object, List, Map etc.
 import java.util.stream.Collectors;
 
 /**
@@ -86,7 +87,7 @@ public class TextAnalyzer {
     /** Wersje plikowe (delegują do readFileToString). */
     public Map<String, Integer> wordFrequencyFromFile(String path,
                                                       Set<String> stopWords,
-                                                      int minWordLength) throws java.io.IOException {
+                                                      int minWordLength) throws IOException {
         String content = FileReader.readResource(path);
         return wordFrequencyFromText(content, stopWords, minWordLength);
     }

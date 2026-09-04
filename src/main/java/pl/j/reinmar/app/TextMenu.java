@@ -4,7 +4,12 @@ import pl.j.reinmar.core.TextAnalyzer;
 import pl.j.reinmar.model.TextStats;
 import pl.j.reinmar.model.WordCount;
 
-import java.util.*;
+import pl.j.reinmar.io.ReportWriter;
+import pl.j.reinmar.io.ReportWriter.Format; // wewn. enum
+
+import java.nio.file.Path;
+
+import java.util.*; // kolekcje
 
 /**
  * TextMenu -> klasa odpowiedzialna za interaktywne menu (switch)
@@ -41,6 +46,9 @@ public class TextMenu {
                 case "3" -> showFrequencyFragment();
                 case "4" -> changeMinWordLength();
                 case "5" -> toggleStopWords();
+                case "6" -> saveBasicStats(); // add
+                case "7" -> saveFullStats(); // add
+                case "8" -> saveWordFrequency(); // add
                 case "0" -> {
                     System.out.println("Koniec. Do zobaczenia!");
                     return;
@@ -131,6 +139,47 @@ public class TextMenu {
         }
     }
 
+    private void saveBasicStats() {
+        try {
+            TextStats stats = analyzer.analyzeFile(path);
+            Format format = askFormat();
+            Path out = askOutputPath(defaultName("basic_stats", format));
+            ReportWriter.writeBasicStats(stats, out, format);
+            System.out.println("Zapisano: " + out.toAbsolutePath());
+        } catch (Exception e) {
+            System.err.println("Błąd zapisu: " + e.getMessage());
+        }
+    }
+
+    private void saveFullStats() {
+        try {
+            TextStats stats = analyzer.analyzeFile(path);
+            Map<String,Integer> freq = analyzer.wordFrequencyFromFile(
+                    path, stopWordsEnabled() ? stopWords : null, minWordLength
+            );
+            Format format = askFormat();
+            Path out = askOutputPath(defaultName("full_stats", format));
+            ReportWriter.writeFullStats(stats, freq, out, format);
+            System.out.println("Zapisano: " + out.toAbsolutePath());
+        } catch (Exception e) {
+            System.err.println("Błąd zapisu: " + e.getMessage());
+        }
+    }
+
+    private void saveWordFrequency() {
+        try {
+            Map<String,Integer> freq = analyzer.wordFrequencyFromFile(
+                    path, stopWordsEnabled() ? stopWords : null, minWordLength
+            );
+            Format format = askFormat();
+            Path out = askOutputPath(defaultName("word_frequency", format));
+            ReportWriter.writeWordFrequency(freq, out, format);
+            System.out.println("Zapisano: " + out.toAbsolutePath());
+        } catch (Exception e) {
+            System.err.println("Błąd zapisu: " + e.getMessage());
+        }
+    }
+
     // Pomocnicze
 
     private int parsePositiveInt(String s, int fallback) {
@@ -153,7 +202,52 @@ public class TextMenu {
         System.out.println("3) Pełna lista częstotliwości (fragment)");
         System.out.println("4) Zmień próg długości słowa (minWordLength)");
         System.out.println("5) Włącz/wyłącz stop‑words");
+        System.out.println("6) Zapisz podstawowe statystyki (CSV/TXT/JSON/XML)"); // new
+        System.out.println("7) Zapisz pełne statystyki (CSV/TXT/JSON/XML)"); // new
+        System.out.println("8) Zapisz częstotliwości słów (CSV/TXT/JSON/XML)"); // new
         System.out.println("0) Wyjście");
         System.out.print("Wybór: ");
     }
+
+    private Format askFormat() {
+        System.out.print("Wybierz format (csv/txt/json/xml): ");
+        String f = sc.nextLine().trim().toLowerCase(Locale.ROOT);
+        return switch (f) {
+            case "csv" -> Format.CSV;
+            case "txt" -> Format.TXT;
+            case "json" -> Format.JSON;
+            case "xml" -> Format.XML;
+            default -> {
+                System.out.println("Nieznany format, domyślnie: JSON");
+                yield Format.JSON;
+            }
+        };
+    }
+
+    private java.nio.file.Path askOutputPath(String defaultFileName) {
+        System.out.print("Podaj nazwę pliku wyjściowego (ENTER = " + defaultFileName + "): ");
+        String name = sc.nextLine().trim();
+        String finalName = name.isEmpty() ? defaultFileName : name;
+        return java.nio.file.Path.of(finalName);
+    }
+
+    private String defaultName(String base, Format f) {
+        String ext = switch (f) {
+            case CSV -> "csv";
+            case TXT -> "txt";
+            case JSON -> "json";
+            case XML -> "xml";
+        };
+        // Jeśli ścieżka bazowa to np. 'pan_tadeusz.txt',  utnij '.txt' i dodaj sufiks raportu
+        String stem = stripTxtSuffix(path);
+        return stem + "-" + base + "." + ext;
+    }
+
+    private String stripTxtSuffix(String p) {
+        if (p != null && p.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+            return p.substring(0, p.length() - 4);
+        }
+        return p;
+    }
+
 }
