@@ -25,8 +25,8 @@ public class SaveBasicReportAction implements MenuAction {
 
     @Override
     public void execute() {
+        Path output = input.askOutputPath("basic_report.txt");
         ReportWriter.Format format = input.askReportFormat();
-        Path output = input.askOutputPath("basic_report.txt", format);
         saver.saveReport(output, path, ReportType.BASIC, settings.getStopWords(),
                 settings.getMinWordLength(), null, 0, format);
     }

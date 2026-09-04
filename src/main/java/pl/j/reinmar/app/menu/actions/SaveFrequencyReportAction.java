@@ -26,8 +26,8 @@ public class SaveFrequencyReportAction implements MenuAction {
 
     @Override
     public void execute() {
+        Path output = input.askOutputPath("frequency_report.txt");
         ReportWriter.Format format = input.askReportFormat();
-        Path output = input.askOutputPath("frequency_report.txt", format);
         WordSort sort = input.askSortMode();
         saver.saveReport(output, path, ReportType.FREQUENCY, settings.getStopWords(),
                 settings.getMinWordLength(), sort, 0, format);

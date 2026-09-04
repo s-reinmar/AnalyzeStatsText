@@ -125,66 +125,21 @@ public class FxUserInput extends UserInput {
 
     @Override
     public Path askOutputPath(String defaultFileName) {
-        return askOutputPath(defaultFileName, null);
-    }
-
-    public Path askOutputPath(String defaultFileName, ReportWriter.Format format) {
-        String suggestedName = defaultFileName;
-        if (format != null) {
-            suggestedName = ensureExtension(defaultFileName, format);
-        }
-
-        TextInputDialog dialog = new TextInputDialog(suggestedName);
+        TextInputDialog dialog = new TextInputDialog(defaultFileName);
         dialog.setTitle("Plik wyjściowy");
         dialog.setHeaderText("Podaj nazwę pliku wyjściowego");
         if (owner != null) {
             dialog.initOwner(owner);
         }
 
-        String name = dialog.showAndWait().orElse(suggestedName).trim();
-        String finalName = resolveFileName(name, suggestedName, format);
+        String name = dialog.showAndWait().orElse(defaultFileName).trim();
+        String finalName = name.isEmpty() ? defaultFileName : name;
+
+        if (!hasValidExtension(finalName)) {
+            finalName = defaultFileName;
+        }
 
         return Path.of("output", finalName);
-    }
-
-    private String resolveFileName(String name, String defaultFileName, ReportWriter.Format format) {
-        if (name.isEmpty()) {
-            return defaultFileName;
-        }
-        if (hasValidExtension(name)) {
-            return name;
-        }
-        if (format != null) {
-            return name + extensionFor(format);
-        }
-        return name + defaultExtension(defaultFileName);
-    }
-
-    private String ensureExtension(String fileName, ReportWriter.Format format) {
-        String extension = extensionFor(format);
-        if (fileName == null || fileName.isBlank()) {
-            return "report" + extension;
-        }
-
-        if (hasValidExtension(fileName)) {
-            return fileName;
-        }
-
-        return fileName + extension;
-    }
-
-    private String extensionFor(ReportWriter.Format format) {
-        return switch (format) {
-            case CSV -> ".csv";
-            case TXT -> ".txt";
-            case JSON -> ".json";
-            case XML -> ".xml";
-        };
-    }
-
-    private String defaultExtension(String defaultFileName) {
-        int idx = defaultFileName.lastIndexOf('.');
-        return idx >= 0 ? defaultFileName.substring(idx) : ".txt";
     }
 
     private boolean hasValidExtension(String fileName) {
