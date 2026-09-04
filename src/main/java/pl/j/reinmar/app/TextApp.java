@@ -1,14 +1,18 @@
 package pl.j.reinmar.app;
 
-import pl.j.reinmar.core.DefaultNormalizer;
-import pl.j.reinmar.core.TextAnalyzer;
-import pl.j.reinmar.core.WhitespaceTokenizer;
+import pl.j.reinmar.core.*;
 import pl.j.reinmar.model.TextStats;
+
+import java.util.List;
 
 public class TextApp {
     public static void main(String[] args) {
         // jeśli implementacje są publiczne:
-        TextAnalyzer analyzer = new TextAnalyzer(new DefaultNormalizer(), new WhitespaceTokenizer());
+        TextAnalyzer analyzer = new TextAnalyzer(
+                new DefaultNormalizer(),
+                new WhitespaceTokenizer(),
+                new DefaultSentenceTokenizer());
+
 
         // analiza stringa
         TextStats stats = analyzer.analyze("To jest przykładowe zdanie.");

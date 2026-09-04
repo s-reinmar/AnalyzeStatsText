@@ -1,14 +1,16 @@
 package pl.j.reinmar.model;
 
-public record TextStats (int charsWithSpaces, int charsWithoutSpaces, int words) {
+public record TextStats (int charsWithSpaces, int charsWithoutSpaces, int words, int sentences) {
 
     @Override
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== STATYSTYKI ===").append(System.lineSeparator());
-        sb.append("Słowa: ").append(words).append(System.lineSeparator());
-        sb.append("Znaki (ze spacjami): ").append(charsWithSpaces).append(System.lineSeparator());
-        sb.append("Znaki (bez spacji): ").append(charsWithoutSpaces).append(System.lineSeparator());
-        return sb.toString();
+    public String toString() {
+        return """
+           === STATYSTYKI ===
+           Słowa: %d
+           Znaki (ze spacjami): %d
+           Znaki (bez spacji): %d
+           Zdania: %d
+           """.formatted(words, charsWithSpaces, charsWithoutSpaces, sentences);
     }
+
 }

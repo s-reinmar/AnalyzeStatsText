@@ -3,7 +3,7 @@ package pl.j.reinmar.core;
 import java.util.List;
 
 /**
- * Tokenizer -> odpowiedzialny za rozbicie na słowa (lub zdania)
+ * Tokenizer -> odpowiedzialny za rozbicie na słowa
  */
 
 public interface Tokenizer {
