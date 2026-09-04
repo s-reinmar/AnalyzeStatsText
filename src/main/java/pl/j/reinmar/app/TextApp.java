@@ -33,13 +33,7 @@ public class TextApp {
         StatsPrinter printer = new StatsPrinter();
         ReportSaver saver = new ReportSaver(analyzer);
 
-        Set<String> stopWords = new HashSet<>(List.of(
-                "i","oraz","że","to","w","na","z","do","się","jest","nie","a","o","po","u","ten","ta","to",
-                "jak","który","która","które","te","dla","przy","albo","lub","czy","tam","tu","nad","pod",
-                "od","bez","więc","co","tak","tylko","mnie","ciebie","jego","jej","ich"
-        ));
-
-        int[] minWordLengthRef = { 2 };
+        Settings settings = new Settings();
 
         Map<MenuOption, MenuAction> actions = MenuActionFactory.create(
                 analyzer,
@@ -47,9 +41,10 @@ public class TextApp {
                 input,
                 printer,
                 saver,
-                stopWords,
-                minWordLengthRef
+                settings
         );
+
+
 
         TextMenu menu = new TextMenu(input, actions);
         menu.run();

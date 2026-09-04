@@ -1,21 +1,24 @@
 package pl.j.reinmar.app.menu.actions;
 
+import pl.j.reinmar.app.Settings;
 import pl.j.reinmar.app.menu.MenuAction;
 import pl.j.reinmar.ui.UserInput;
 
 public class ChangeMinWordLengthAction implements MenuAction {
 
     private final UserInput input;
-    private final int[] minWordLengthRef;
+    private final Settings settings;
 
-    public ChangeMinWordLengthAction(UserInput input, int[] minWordLengthRef) {
+    public ChangeMinWordLengthAction(UserInput input, Settings settings) {
         this.input = input;
-        this.minWordLengthRef = minWordLengthRef;
+        this.settings = settings;
     }
 
     @Override
     public void execute() {
-        minWordLengthRef[0] = input.askMinWordLength(minWordLengthRef[0]);
+        int current = settings.getMinWordLength();
+        int updated = input.askMinWordLength(current);
+        settings.setMinWordLength(updated);
     }
 
     @Override

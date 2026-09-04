@@ -1,12 +1,11 @@
 package pl.j.reinmar.app.menu.actions;
 
+import pl.j.reinmar.app.Settings;
 import pl.j.reinmar.app.menu.MenuAction;
 import pl.j.reinmar.core.TextAnalyzer;
 import pl.j.reinmar.model.WordSort;
 import pl.j.reinmar.ui.StatsPrinter;
 import pl.j.reinmar.ui.UserInput;
-
-import java.util.Set;
 
 public class TopWordsAction implements MenuAction {
 
@@ -14,24 +13,22 @@ public class TopWordsAction implements MenuAction {
     private final StatsPrinter printer;
     private final UserInput input;
     private final String path;
-    private final Set<String> stopWords;
-    private final int minWordLength;
+    private final Settings settings;
 
     public TopWordsAction(TextAnalyzer analyzer, StatsPrinter printer, UserInput input,
-                          String path, Set<String> stopWords, int minWordLength) {
+                          String path, Settings settings) {
         this.analyzer = analyzer;
         this.printer = printer;
         this.input = input;
         this.path = path;
-        this.stopWords = stopWords;
-        this.minWordLength = minWordLength;
+        this.settings = settings;
     }
 
     @Override
     public void execute() {
         int n = input.askInt("Podaj N", 20);
         WordSort sort = input.askSortMode();
-        printer.printTopWords(analyzer, path, n, stopWords, minWordLength, sort);
+        printer.printTopWords(analyzer, path, n, settings.getStopWords(), settings.getMinWordLength(), sort);
     }
 
     @Override

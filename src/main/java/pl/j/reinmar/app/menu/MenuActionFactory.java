@@ -1,5 +1,6 @@
 package pl.j.reinmar.app.menu;
 
+import pl.j.reinmar.app.Settings;
 import pl.j.reinmar.app.menu.actions.*;
 import pl.j.reinmar.core.TextAnalyzer;
 import pl.j.reinmar.ui.ReportSaver;
@@ -8,7 +9,6 @@ import pl.j.reinmar.ui.UserInput;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 
 public class MenuActionFactory {
 
@@ -18,8 +18,7 @@ public class MenuActionFactory {
             UserInput input,
             StatsPrinter printer,
             ReportSaver saver,
-            Set<String> stopWords,
-            int[] minWordLengthRef
+            Settings settings
     ) {
         Map<MenuOption, MenuAction> map = new EnumMap<>(MenuOption.class);
 
@@ -27,29 +26,30 @@ public class MenuActionFactory {
                 new BasicStatsAction(analyzer, printer, path));
 
         map.put(MenuOption.TOP_WORDS,
-                new TopWordsAction(analyzer, printer, input, path, stopWords, minWordLengthRef[0]));
+                new TopWordsAction(analyzer, printer, input, path, settings));
 
         map.put(MenuOption.FREQUENCY_FRAGMENT,
-                new FrequencyFragmentAction(analyzer, printer, path, stopWords, minWordLengthRef[0]));
+                new FrequencyFragmentAction(analyzer, printer, path, settings));
 
         map.put(MenuOption.CHANGE_MIN_LENGTH,
-                new ChangeMinWordLengthAction(input, minWordLengthRef));
+                new ChangeMinWordLengthAction(input, settings));
 
         map.put(MenuOption.TOGGLE_STOPWORDS,
-                new ToggleStopWordsAction(stopWords, Set.copyOf(stopWords)));
+                new ToggleStopWordsAction(settings));
 
         map.put(MenuOption.SAVE_BASIC,
-                new SaveBasicReportAction(saver, input, path, stopWords, minWordLengthRef));
+                new SaveBasicReportAction(saver, input, path, settings));
 
         map.put(MenuOption.SAVE_FULL,
-                new SaveFullReportAction(saver, input, path, stopWords, minWordLengthRef));
+                new SaveFullReportAction(saver, input, path, settings));
 
         map.put(MenuOption.SAVE_FREQUENCY,
-                new SaveFrequencyReportAction(saver, input, path, stopWords, minWordLengthRef));
+                new SaveFrequencyReportAction(saver, input, path, settings));
 
         map.put(MenuOption.EXIT,
                 new ExitAction());
 
         return map;
     }
+
 }
