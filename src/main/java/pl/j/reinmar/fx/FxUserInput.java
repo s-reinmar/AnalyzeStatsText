@@ -1,4 +1,4 @@
-package pl.j.reinmar.app;
+package pl.j.reinmar.fx;
 
 import pl.j.reinmar.io.ReportWriter;
 import pl.j.reinmar.model.WordSort;

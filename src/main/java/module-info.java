@@ -5,4 +5,8 @@ module pl.j.reinmar {
 
     exports pl.j.reinmar.app to javafx.graphics;
     opens pl.j.reinmar.app to javafx.fxml;
+    exports pl.j.reinmar.fx to javafx.graphics;
+    opens pl.j.reinmar.fx to javafx.fxml;
+    exports pl.j.reinmar.cli to javafx.graphics;
+    opens pl.j.reinmar.cli to javafx.fxml;
 }

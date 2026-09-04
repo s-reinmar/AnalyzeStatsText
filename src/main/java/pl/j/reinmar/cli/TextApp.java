@@ -1,5 +1,6 @@
-package pl.j.reinmar.app;
+package pl.j.reinmar.cli;
 
+import pl.j.reinmar.app.Settings;
 import pl.j.reinmar.app.menu.MenuAction;
 import pl.j.reinmar.app.menu.MenuActionFactory;
 import pl.j.reinmar.app.menu.MenuOption;

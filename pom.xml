@@ -39,7 +39,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>pl.j.reinmar.app.FxApp</mainClass>
+                    <mainClass>pl.j.reinmar.fx.FxApp</mainClass>
                     <launcher>analyzerfx</launcher>
                     <jlinkImageName>analyzerfx-image</jlinkImageName>
                     <jlinkZipName>analyzerfx</jlinkZipName>
@@ -65,7 +65,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>pl.j.reinmar.app.FxApp</mainClass>
+                            <mainClass>pl.j.reinmar.fx.FxApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

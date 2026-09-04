@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="pl.j.reinmar.app.FxController"
+            fx:controller="pl.j.reinmar.fx.FxController"
             prefWidth="900" prefHeight="600">
     <top>
         <HBox spacing="8" style="-fx-padding: 10;">
