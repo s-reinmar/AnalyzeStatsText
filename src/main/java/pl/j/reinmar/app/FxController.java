@@ -12,9 +12,16 @@ import pl.j.reinmar.ui.StatsPrinter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -27,11 +34,11 @@ public class FxController {
     @FXML
     private TextField baseNameField;
     @FXML
+    private Label statusLabel;
+    @FXML
     private ListView<MenuAction> menuList;
     @FXML
     private TextArea logArea;
-    @FXML
-    private Label statusLabel;
 
     private TextAnalyzer analyzer;
     private Settings settings;
@@ -66,7 +73,7 @@ public class FxController {
         statusLabel.setText("Gotowe. Wpisz nazwę pliku bez .txt");
         baseNameField.setText("file");
 
-        // owner dla dialogów dostępny dopiero po osadzeniu node w scenie
+        // Owner dla dialogów dostępny dopiero po osadzeniu node w scenie.
         logArea.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 Window window = newScene.getWindow();
@@ -87,9 +94,65 @@ public class FxController {
             return;
         }
 
-        currentPath = baseName + ".txt";
-        StatsPrinter printer = new StatsPrinter();
+        if (baseName.endsWith(".txt") || baseName.contains("\\") || baseName.contains("/")) {
+            currentPath = baseName;
+        } else {
+            currentPath = baseName + ".txt";
+        }
 
+        refreshActionsForCurrentPath();
+    }
+
+    @FXML
+    public void onBrowseFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Wybierz plik tekstowy");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Pliki tekstowe", "*.txt"),
+                new FileChooser.ExtensionFilter("Wszystkie pliki", "*.*")
+        );
+
+        File initialDir = new File(System.getProperty("user.home"));
+        if (initialDir.exists()) {
+            fileChooser.setInitialDirectory(initialDir);
+        }
+
+        Window window = baseNameField.getScene() != null ? baseNameField.getScene().getWindow() : null;
+        File selectedFile = fileChooser.showOpenDialog(window);
+
+        if (selectedFile == null) {
+            return;
+        }
+
+        currentPath = selectedFile.getAbsolutePath();
+        baseNameField.setText(currentPath);
+        refreshActionsForCurrentPath();
+    }
+
+    @FXML
+    public void onExecuteSelected() {
+        MenuAction selected = menuList.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            statusLabel.setText("Wybierz opcję z listy.");
+            return;
+        }
+
+        if (currentPath == null || currentPath.isBlank()) {
+            statusLabel.setText("Najpierw załaduj plik wejściowy.");
+            return;
+        }
+
+        try {
+            selected.execute();
+            statusLabel.setText("Wykonano: " + selected.label());
+        } catch (Exception e) {
+            statusLabel.setText("Błąd wykonania akcji.");
+            System.err.println("Błąd akcji: " + e.getMessage());
+        }
+    }
+
+    private void refreshActionsForCurrentPath() {
+        StatsPrinter printer = new StatsPrinter();
         Map<MenuOption, MenuAction> actions = MenuActionFactory.create(
                 analyzer,
                 currentPath,
@@ -112,28 +175,6 @@ public class FxController {
         System.out.println("Aktywny plik wejściowy: " + currentPath);
     }
 
-    @FXML
-    public void onExecuteSelected() {
-        MenuAction selected = menuList.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Wybierz opcję z listy.");
-            return;
-        }
-
-        if (currentPath == null || currentPath.isBlank()) {
-            statusLabel.setText("Najpierw załaduj plik wejściowy.");
-            return;
-        }
-
-        try {
-            selected.execute();
-            statusLabel.setText("Wykonano: " + selected.label());
-        } catch (Exception e) {
-            statusLabel.setText("Błąd wykonania akcji.");
-            System.err.println("❌ Błąd akcji: " + e.getMessage());
-        }
-    }
-
     private void installConsoleRedirect() {
         PrintStream out = new PrintStream(new TextAreaOutputStream(logArea), true, StandardCharsets.UTF_8);
         PrintStream err = new PrintStream(new TextAreaOutputStream(logArea), true, StandardCharsets.UTF_8);
@@ -143,7 +184,7 @@ public class FxController {
 
     private static final class TextAreaOutputStream extends OutputStream {
         private final TextArea textArea;
-        private final java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+        private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         private TextAreaOutputStream(TextArea textArea) {
             this.textArea = textArea;
@@ -167,7 +208,7 @@ public class FxController {
             if (buffer.size() == 0) {
                 return;
             }
-            String line = buffer.toString(java.nio.charset.StandardCharsets.UTF_8);
+            String line = buffer.toString(StandardCharsets.UTF_8);
             buffer.reset();
 
             Platform.runLater(() -> {
@@ -175,5 +216,6 @@ public class FxController {
                 textArea.appendText(System.lineSeparator());
             });
         }
+
     }
 }

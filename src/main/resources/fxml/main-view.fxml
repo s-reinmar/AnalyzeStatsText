@@ -9,8 +9,9 @@
     <top>
         <HBox spacing="8" style="-fx-padding: 10;">
             <Label text="Plik bazowy (bez .txt):"/>
-            <TextField fx:id="baseNameField" promptText="np. file"/>
+            <TextField fx:id="baseNameField" promptText="np. file" prefWidth="200"/>
             <Button text="Załaduj" onAction="#onLoadFile"/>
+            <Button text="Przeglądaj..." onAction="#onBrowseFile"/>
             <Label fx:id="statusLabel" text="Gotowe"/>
         </HBox>
     </top>
