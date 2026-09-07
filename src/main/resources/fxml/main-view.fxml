@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  Główny plik widoku FXML dla interfejsu graficznego aplikacji Text Analyzer.
+
+  Opis struktury i układowi (Layout):
+  - BorderPane: Główny kontener aplikacji (900x600).
+    - TOP (HBox): Pasek ładujący plik źródłowy (pole tekstowe baseNameField, przyciski akcji, etykieta statusLabel).
+    - LEFT (VBox): Panel boczny nawigacji/menu (lista opcji menuList oraz przycisk wykonania akcji).
+    - CENTER (VBox): Główny obszar roboczy służący jako konsola wyjściowa (pole logArea wyłączone z edycji).
+
+  Powiązanie z kontrolerem:
+  @see pl.j.reinmar.fx.FxController
+
+  Komponenty osadzone (@FXML):
+  - baseNameField : TextField - pole tekstowe do wprowadzania nazwy pliku wejściowego
+  - statusLabel   : Label     - etykieta wyświetlająca aktualny stan/komunikaty aplikacji
+  - menuList      : ListView  - lista przechowująca dostępne opcje menu (MenuAction)
+  - logArea       : TextArea  - konsola tekstowa przechwytująca strumień wyjściowy i błędy
+
+  Metody obsługi zdarzeń (@FXML):
+  - onLoadFile()        - ładuje plik na podstawie nazwy wpisanej w baseNameField
+  - onBrowseFile()      - otwiera systemowe okno wyboru pliku (FileChooser)
+  - onExecuteSelected() - uruchamia akcję zaznaczoną na liście menuList
+
+  @author Sławek Reinmar
+  @version 1.0
+-->
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 

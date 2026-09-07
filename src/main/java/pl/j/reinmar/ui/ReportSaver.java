@@ -13,30 +13,46 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Klasa odpowiedzialna za orkiestrację procesu tworzenia raportów:
- * - pobiera dane z TextAnalyzer,
- * - deleguje budowanie treści do ReportBuilder,
- * - deleguje zapis do ReportWriter.
+ * Komponent odpowiedzialny za koordynację procesu generowania oraz zapisu raportów z analizy tekstu do pliku.
+ * <p>
+ * Klasa spaja funkcjonalności silnika analitycznego ({@link TextAnalyzer}), budowniczego treści ({@link ReportBuilder})
+ * oraz modułu zapisu ({@link ReportWriter}), automatyzując pobieranie statystyk, filtrowanie słów i formatowanie wyjścia.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
  */
 public class ReportSaver {
 
+    /** Silnik analityczny wykorzystywany do przetwarzania plików tekstowych. */
     private final TextAnalyzer analyzer;
 
+    /**
+     * Tworzy nową instancję komponentu zapisującego raporty.
+     *
+     * @param analyzer silnik analityczny {@link TextAnalyzer} do przeprowadzania analizy plików
+     */
     public ReportSaver(TextAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
 
     /**
-     * Tworzy i zapisuje raport do pliku.
+     * Przeprowadza pełny proces generowania oraz zapisu raportu na podstawie podanych parametrów.
+     * <p>
+     * Metoda pobiera statystyki podstawowe oraz mapę częstotliwości słów z wybranego pliku wejściowego,
+     * aplikuje kryteria filtrowania (stop-words, minimalna długość słowa) i sortowania, a następnie
+     * buduje oraz zapisuje raport pod wskazaną ścieżką w wybranym formacie wyjściowym.
+     * Wszelkie błędy odczytu lub zapisu są wyłapywane i wypisywane na strumień błędów.
+     * </p>
      *
-     * @param outputPath   ścieżka docelowa
-     * @param inputPath    ścieżka do pliku wejściowego
-     * @param type         typ raportu (BASIC, FULL, FREQUENCY)
-     * @param stopWords    zbiór stop-words
-     * @param minWordLength minimalna długość słowa
-     * @param sortMode     tryb sortowania słów
-     * @param topN         liczba słów dla TOP_WORDS (ignorowane dla innych typów)
-     * @param format       format raportu (CSV, TXT, JSON, XML)
+     * @param outputPath    docelowa ścieżka {@link Path} do zapisywanego pliku raportu
+     * @param inputPath     ścieżka do pliku źródłowego z tekstem do analizy
+     * @param type          typ i zakres generowanego raportu ({@link ReportType})
+     * @param stopWords     zbiór słów ignorowanych lub {@code null}, jeśli brak filtrowania
+     * @param minWordLength minimalna długość uwzględnianych słów
+     * @param sortMode      tryb sortowania wyników ({@link WordSort})
+     * @param topN          maksymalna liczba słów (używana w odpowiednich trybach analizy)
+     * @param format        format wyjściowy pliku ({@link ReportWriter.Format})
      */
     public void saveReport(Path outputPath,
                            String inputPath,

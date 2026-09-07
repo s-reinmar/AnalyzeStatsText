@@ -14,8 +14,32 @@ import pl.j.reinmar.ui.UserInput;
 
 import java.util.*;
 
+/**
+ * Główna klasa uruchomieniowa dla interfejsu konsolowego (CLI) aplikacji.
+ * <p>
+ * Odpowiada za inicjalizację i związanie głównych komponentów systemu:
+ * analizatora tekstu ({@link TextAnalyzer}), komponentów wejścia/wyjścia
+ * ({@link UserInput}, {@link StatsPrinter}, {@link ReportSaver}), domyślnych ustawień
+ * ({@link Settings}) oraz fabryki menu ({@link MenuActionFactory}). Następnie uruchamia
+ * pętlę interaktywnego menu konsolowego ({@link TextMenu}).
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class TextApp {
 
+    /**
+     * Domyślny konstruktor klasy wywoływalnej aplikacji konsolowej.
+     */
+    public TextApp() {
+    }
+
+    /**
+     * Główny punkt wejścia (Main Entry Point) dla wersji konsolowej (CLI) aplikacji.
+     *
+     * @param args argumenty wiersza poleceń przekazywane przy uruchamianiu programu
+     */
     public static void main(String[] args) {
 
         TextAnalyzer analyzer = new TextAnalyzer(
@@ -44,8 +68,6 @@ public class TextApp {
                 saver,
                 settings
         );
-
-
 
         TextMenu menu = new TextMenu(input, actions);
         menu.run();

@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="AnalyzeStatsText2">
+    <output-path>$PROJECT_DIR$/out/artifacts/AnalyzeStatsText2</output-path>
+    <root id="root">
+      <element id="archive" name="AnalyzeStatsText.jar">
+        <element id="module-output" name="AnalyzeStatsText" />
+      </element>
+    </root>
+  </artifact>
+</component>

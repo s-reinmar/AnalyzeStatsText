@@ -10,8 +10,36 @@ import pl.j.reinmar.ui.UserInput;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Fabryka (Factory) odpowiedzialna za tworzenie i mapowanie akcji menu.
+ * <p>
+ * Klasa wstrzykuje wymagane zależności (analizator tekstu, interfejsy I/O,
+ * obiekty konfiguracji) do poszczególnych obiektów {@link MenuAction}
+ * i przypisuje je do odpowiadających im opcji w {@link MenuOption}.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class MenuActionFactory {
 
+    /**
+     * Prywatny konstruktor zapobiegający tworzeniu instancji klasy narzędziowej.
+     */
+    private MenuActionFactory() {
+    }
+
+    /**
+     * Tworzy mapę wiążącą opcje menu ({@link MenuOption}) z konkretnymi akcjami ({@link MenuAction}).
+     *
+     * @param analyzer instancja {@link TextAnalyzer} służąca do analizy tekstu
+     * @param path     ścieżka do przetwarzanego pliku lub źródła danych
+     * @param input    komponent {@link UserInput} do interakcji i pobierania danych od użytkownika
+     * @param printer  komponent {@link StatsPrinter} do wyświetlania wyników
+     * @param saver    komponent {@link ReportSaver} do zapisywania raportów na dysku
+     * @param settings obiekty konfiguracji i ustawień aplikacji {@link Settings}
+     * @return zmapowana kolekcja {@link Map} opcji menu i przypisanych do nich akcji
+     */
     public static Map<MenuOption, MenuAction> create(
             TextAnalyzer analyzer,
             String path,

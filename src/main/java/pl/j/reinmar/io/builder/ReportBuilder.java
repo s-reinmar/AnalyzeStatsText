@@ -6,19 +6,32 @@ import pl.j.reinmar.model.TextStats;
 import java.util.Map;
 
 /**
- * Buduje treść raportów w zależności od typu raportu i formatu.
- * Deleguje formatowanie do odpowiedniego Formattera.
+ * Klasa pomocnicza (budowniczego) odpowiedzialna za składanie treści raportów na podstawie typu i formatu.
+ * <p>
+ * Wykorzystuje wzorzec fabryki/budowniczego do przekierowania procesu generowania zawartości
+ * raportu do odpowiedniej metody formatującej interfejsu {@link Formatter} w zależności
+ * od wskazanego wariantu {@link ReportType}.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
  */
 public class ReportBuilder {
 
     /**
-     * Główna metoda budująca raport.
+     * Domyślny konstruktor klasy budującej raporty.
+     */
+    public ReportBuilder() {
+    }
+
+    /**
+     * Buduje treść raportu tekstowego na podstawie wybranego typu, statystyk oraz formatera.
      *
-     * @param type   typ raportu (BASIC, FULL, FREQUENCY)
-     * @param stats  statystyki tekstu (dla BASIC i FULL)
-     * @param freq   częstotliwości słów (dla FULL i FREQUENCY)
-     * @param f      formatter odpowiedzialny za format wyjściowy
-     * @return gotowa treść raportu
+     * @param type  typ generowanego raportu ({@link ReportType})
+     * @param stats podstawowe statystyki ilościowe tekstu ({@link TextStats})
+     * @param freq  mapa częstotliwości występowania słów (słowo -&gt; liczba wystąpień)
+     * @param f     komponent formatujący treść wyjściową ({@link Formatter})
+     * @return gotowy do zapisu lub wyświetlenia ciąg znaków reprezentujący raport
      */
     public static String build(ReportType type,
                                TextStats stats,

@@ -8,8 +8,30 @@ import pl.j.reinmar.model.WordSort;
 
 import java.util.*;
 
+/**
+ * Komponent odpowiedzialny za formatowanie i drukowanie statystyk analizy tekstu na standardowe wyjście.
+ * <p>
+ * Klasa udostępnia metody wyjścia konsolowego przeznaczone do prezentacji statystyk podstawowych,
+ * wykazów najczęstszych słów (Top N) oraz podglądu pełnych zestawień częstotliwościowych.
+ * </p>
+
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class StatsPrinter {
 
+    /**
+     * Domyślny konstruktor klasy drukującej statystyki.
+     */
+    public StatsPrinter() {
+    }
+
+    /**
+     * Wczytuje plik, oblicza i drukuje na standardowe wyjście podstawowe statystyki ilościowe.
+     *
+     * @param analyzer silnik analityczny {@link TextAnalyzer}
+     * @param path     ścieżka do pliku źródłowego
+     */
     public void printBasicStats(TextAnalyzer analyzer, String path) {
         try {
             TextStats stats = analyzer.analyzeFile(path);
@@ -25,6 +47,16 @@ public class StatsPrinter {
         }
     }
 
+    /**
+     * Wczytuje plik, filtruje słowa i wyświetla listę ograniczoną do podanej liczby najczęstszych wyrazów (Top N).
+     *
+     * @param analyzer      silnik analityczny {@link TextAnalyzer}
+     * @param path          ścieżka do pliku źródłowego
+     * @param topN          liczba pozycji do wyświetlenia
+     * @param stopWords     zbiór ignorowanych słów lub {@code null}
+     * @param minWordLength minimalna długość uwzględnianych słów
+     * @param sortMode      tryb sortowania wyników ({@link WordSort})
+     */
     public void printTopWords(TextAnalyzer analyzer,
                               String path,
                               int topN,
@@ -44,13 +76,22 @@ public class StatsPrinter {
             );
 
             System.out.println("=== TOP " + topN + " słów — sortowanie: " + sortMode + " ===");
-            top.forEach(wc -> System.out.printf(wc.word() + " : " + wc.count()) );
+            top.forEach(wc -> System.out.printf(wc.word() + " : " + wc.count()));
 
         } catch (Exception e) {
             System.err.println("❌ Błąd odczytu pliku: " + e.getMessage());
         }
     }
 
+    /**
+     * Wczytuje plik i wyświetla skrócony podgląd (maksymalnie pierwsze 50 wpisów) zestawienia częstotliwości słów.
+     *
+     * @param analyzer      silnik analityczny {@link TextAnalyzer}
+     * @param path          ścieżka do pliku źródłowego
+     * @param stopWords     zbiór ignorowanych słów lub {@code null}
+     * @param minWordLength minimalna długość uwzględnianych słów
+     * @param sortMode      tryb sortowania wyników ({@link WordSort})
+     */
     public void printFrequencyPreview(TextAnalyzer analyzer,
                                       String path,
                                       Set<String> stopWords,

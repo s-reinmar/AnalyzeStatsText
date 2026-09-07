@@ -6,8 +6,31 @@ import pl.j.reinmar.model.TextStats;
 
 import java.util.Map;
 
+/**
+ * Implementacja interfejsu {@link Formatter} formatująca dane wyjściowe do struktury JSON (JavaScript Object Notation).
+ * <p>
+ * Klasa generuje dokumenty JSON zawierające sygnaturę czasową wygenerowania raportu
+ * (uzyskiwaną z {@link TimeUtil#now()}), odpowiednio sformatowane wartości numeryczne oraz
+ * klucze słownika zeskapowane przed znakami specjalnymi za pomocą {@link Escape#json(String)}.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class JsonFormatter implements Formatter {
 
+    /**
+     * Domyślny konstruktor formatera JSON.
+     */
+    public JsonFormatter() {
+    }
+
+    /**
+     * Formatuj podstawowe statystyki tekstu do postaci obiektu JSON.
+     *
+     * @param stats podstawowe statystyki ilościowe tekstu ({@link TextStats})
+     * @return ciąg znaków w formacie JSON zawierający sekcję metryk oraz metadane
+     */
     @Override
     public String formatBasic(TextStats stats) {
         return """
@@ -30,6 +53,13 @@ public class JsonFormatter implements Formatter {
         );
     }
 
+    /**
+     * Formatuj pełny raport (statystyki podstawowe oraz słownik częstotliwości) do postaci obiektu JSON.
+     *
+     * @param stats podstawowe statystyki ilościowe tekstu ({@link TextStats})
+     * @param freq  mapa częstotliwości występowania słów (słowo -&gt; liczba wystąpień)
+     * @return ciąg znaków w formacie JSON zawierający podpunkty statystyk oraz mapę częstotliwości
+     */
     @Override
     public String formatFull(TextStats stats, Map<String, Integer> freq) {
         StringBuilder sb = new StringBuilder("""
@@ -61,6 +91,12 @@ public class JsonFormatter implements Formatter {
         return sb.toString();
     }
 
+    /**
+     * Formatuj samą mapę częstotliwości występowania słów do postaci obiektu JSON.
+     *
+     * @param freq mapa częstotliwości występowania słów (słowo -&gt; liczba wystąpień)
+     * @return ciąg znaków w formacie JSON reprezentujący słownik klucz-wartość dla częstotliwości
+     */
     @Override
     public String formatFrequency(Map<String, Integer> freq) {
         StringBuilder sb = new StringBuilder("""

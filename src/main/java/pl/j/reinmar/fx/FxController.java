@@ -30,23 +30,64 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Kontroler widoku FXML dla interfejsu graficznego aplikacji (JavaFX).
+ * <p>
+ * Klasa odpowiada za obsługę zdarzeń interfejsu użytkownika, zarządzanie wybranym plikiem źródłowym,
+ * przekierowanie strumieni wyjściowych {@link System#out} i {@link System#err} do komponentu {@link TextArea},
+ * oraz dynamiczne budowanie i wykonywanie akcji menu ({@link MenuAction}) za pomocą {@link FxUserInput}.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class FxController {
 
+    /** Pole tekstowe służące do wprowadzania lub wyświetlania ścieżki pliku źródłowego. */
     @FXML
     private TextField baseNameField;
+
+    /** Etykieta informacyjna wyświetlająca aktualny status aplikacji. */
     @FXML
     private Label statusLabel;
+
+    /** Lista komponentów GUI wyświetlająca dostępne akcje menu. */
     @FXML
     private ListView<MenuAction> menuList;
+
+    /** Obszar tekstowy stanowiący konsolę wyjściową dla wyników analizy i błędów. */
     @FXML
     private TextArea logArea;
 
+    /** Główny silnik analityczny tekstu. */
     private TextAnalyzer analyzer;
+
+    /** Obiekt globalnych ustawień aplikacji. */
     private Settings settings;
+
+    /** Komponent odpowiedzialny za zapis raportów do plików. */
     private ReportSaver saver;
+
+    /** Adapter interakcji z użytkownikiem dostosowany do okien dialogowych JavaFX. */
     private FxUserInput input;
+
+    /** Aktualnie załadowana ścieżka do pliku tekstowego. */
     private String currentPath;
 
+    /**
+     * Domyślny konstruktor kontrolera widoku JavaFX.
+     */
+    public FxController() {
+    }
+
+    /**
+     * Inicjalizuje kontroler po załadowaniu pliku FXML.
+     * <p>
+     * Metoda konfiguruje silnik analityczny, widok komórek w {@link ListView}, przekierowuje standardowe
+     * strumienie wyjściowe do obszaru {@link TextArea} oraz rejestruje słuchacza sceny w celu ustawienia
+     * okna nadrzędnego (Owner Window) dla dialogów interaktywnych.
+     * </p>
+     */
     @FXML
     public void initialize() {
         analyzer = new TextAnalyzer(
@@ -87,6 +128,13 @@ public class FxController {
         });
     }
 
+    /**
+     * Obsługuje zdarzenie załadowania pliku wprowadzonego w polu tekstowym.
+     * <p>
+     * Normalizuje podaną nazwę (dodaje rozszerzenie {@code .txt}, jeśli nie zostało podane)
+     * i odświeża listę dostępnych akcji dla wybranej ścieżki.
+     * </p>
+     */
     @FXML
     public void onLoadFile() {
         String baseName = baseNameField.getText() == null ? "" : baseNameField.getText().trim();
@@ -104,6 +152,13 @@ public class FxController {
         refreshActionsForCurrentPath();
     }
 
+    /**
+     * Obsługuje zdarzenie otwarcia okna wyboru pliku ({@link FileChooser}).
+     * <p>
+     * Pozwala użytkownikowi na wskazanie pliku z dysku, po czym aktualizuje pole tekstowe
+     * i ładuje opcje dla wybranej ścieżki bezwzględnej.
+     * </p>
+     */
     @FXML
     public void onBrowseFile() {
         FileChooser fileChooser = new FileChooser();
@@ -130,6 +185,13 @@ public class FxController {
         refreshActionsForCurrentPath();
     }
 
+    /**
+     * Wykonuje zaznaczoną na liście opcję menu ({@link MenuAction}).
+     * <p>
+     * Przed uruchomieniem czyszczony jest obszar konsoli wyjściowej ({@link TextArea}).
+     * Wszelkie wyjątki rzucane podczas wykonywania akcji są wyłapywane i sygnalizowane na pasku statusu.
+     * </p>
+     */
     @FXML
     public void onExecuteSelected() {
         MenuAction selected = menuList.getSelectionModel().getSelectedItem();
@@ -155,6 +217,9 @@ public class FxController {
         }
     }
 
+    /**
+     * Odświeża mapowanie akcji menu dla nowo wybranej ścieżki do pliku.
+     */
     private void refreshActionsForCurrentPath() {
         StatsPrinter printer = new StatsPrinter();
         Map<MenuOption, MenuAction> actions = MenuActionFactory.create(
@@ -179,6 +244,9 @@ public class FxController {
         System.out.println("Aktywny plik wejściowy: " + currentPath);
     }
 
+    /**
+     * Przekierowuje strumienie {@link System#out} oraz {@link System#err} do komponentu {@link TextArea}.
+     */
     private void installConsoleRedirect() {
         PrintStream out = new PrintStream(new TextAreaOutputStream(logArea), true, StandardCharsets.UTF_8);
         PrintStream err = new PrintStream(new TextAreaOutputStream(logArea), true, StandardCharsets.UTF_8);
@@ -186,14 +254,32 @@ public class FxController {
         System.setErr(err);
     }
 
+    /**
+     * Pomocniczy strumień wyjściowy buforujący bajty i dopisujący pełne linie do obiektu {@link TextArea}
+     * w wątku graficznym ({@link Platform#runLater(Runnable)}).
+     */
     private static final class TextAreaOutputStream extends OutputStream {
+
+        /** Komponent tekstu, do którego dopisywane są wyjściowe linie. */
         private final TextArea textArea;
+
+        /** Wewnętrzny bufor bajtów. */
         private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
+        /**
+         * Tworzy strumień dopisujący wyjście do podanego pola tekstowego.
+         *
+         * @param textArea komponent {@link TextArea} stanowiący cel wyjścia
+         */
         private TextAreaOutputStream(TextArea textArea) {
             this.textArea = textArea;
         }
 
+        /**
+         * Zapisuje pojedynczy bajt do bufora. Jeśli napotka znak nowej linii, wypłukuje bufor.
+         *
+         * @param b zapisywany bajt
+         */
         @Override
         public synchronized void write(int b) {
             if (b == '\n') {
@@ -203,11 +289,18 @@ public class FxController {
             }
         }
 
+        /**
+         * Wypłukuje zawartość bufora do komponentu tekstowego.
+         */
         @Override
         public synchronized void flush() {
             flushBuffer();
         }
 
+        /**
+         * Opróżnia wewnętrzny bufor i dopisuje sformatowaną linię tekstu do {@link TextArea}
+         * w wątku aplikacji JavaFX.
+         */
         private void flushBuffer() {
             if (buffer.size() == 0) {
                 return;
@@ -220,6 +313,5 @@ public class FxController {
                 textArea.appendText(System.lineSeparator());
             });
         }
-
     }
 }

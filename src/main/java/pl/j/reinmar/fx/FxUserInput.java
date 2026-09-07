@@ -13,19 +13,45 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Adapter klasy {@link UserInput} dostosowany do interfejsu graficznego JavaFX.
+ * <p>
+ * Zastępuje konsolowe metody pobierania danych od użytkownika graficznymi oknami dialogowymi
+ * ({@link TextInputDialog} oraz {@link ChoiceDialog}). Klasa umożliwia również przypisanie
+ * okna nadrzędnego ({@link Window}), aby dialogi były modalne względem głównego okna aplikacji.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class FxUserInput extends UserInput {
 
+    /** Okno nadrzędne (owner) dla wyświetlanych okien dialogowych JavaFX. */
     private Window owner;
 
+    /**
+     * Tworzy nową instancję adaptera graficznego pobierania danych.
+     * Inicjalizuje klasę nadrzędną atrapą obiektu {@link Scanner}.
+     */
     public FxUserInput() {
         // Bazowa klasa wymaga Scanner; tu używamy dialogów JavaFX.
         super(new Scanner(System.in));
     }
 
+    /**
+     * Ustawia okno nadrzędne dla okien dialogowych generowanych przez tę klasę.
+     *
+     * @param owner okno {@link Window} stanowiące kontekst nadrzędny dla dialogów
+     */
     public void setOwner(Window owner) {
         this.owner = owner;
     }
 
+    /**
+     * Odczytuje linię tekstu od użytkownika za pomocą okna dialogowego {@link TextInputDialog}.
+     *
+     * @return wprowadzony tekst lub pusty ciąg znaków, jeśli dialog został anulowany
+     */
     @Override
     public String readLine() {
         TextInputDialog dialog = new TextInputDialog("");
@@ -37,6 +63,13 @@ public class FxUserInput extends UserInput {
         return dialog.showAndWait().orElse("");
     }
 
+    /**
+     * Wyświetla okno dialogowe z zapytaniem o liczbę całkowitą (N).
+     *
+     * @param prompt   komunikat/etykieta zapytania
+     * @param fallback wartość domyślna zwracana w przypadku anulowania lub błędnych danych
+     * @return wprowadzona dodatnia liczba całkowita lub wartość {@code fallback}
+     */
     @Override
     public int askInt(String prompt, int fallback) {
         TextInputDialog dialog = new TextInputDialog(String.valueOf(fallback));
@@ -59,6 +92,12 @@ public class FxUserInput extends UserInput {
         }
     }
 
+    /**
+     * Wyświetla okno dialogowe do zmiany minimalnej długości uwzględnianych słów.
+     *
+     * @param current aktualnie ustawiona minimalna długość słowa
+     * @return nowa długość słowa (minimum 1) lub wartość {@code current} w przypadku błędu/anulowania
+     */
     @Override
     public int askMinWordLength(int current) {
         TextInputDialog dialog = new TextInputDialog(String.valueOf(current));
@@ -81,6 +120,11 @@ public class FxUserInput extends UserInput {
         }
     }
 
+    /**
+     * Wyświetla okno wyboru rozwijalnego ({@link ChoiceDialog}) z dostępnymi formatami raportów.
+     *
+     * @return wybrana wartość wyliczeniowa {@link ReportWriter.Format} (domyślnie {@code TXT})
+     */
     @Override
     public ReportWriter.Format askReportFormat() {
         List<String> choices = List.of("txt", "csv", "json", "xml");
@@ -100,6 +144,11 @@ public class FxUserInput extends UserInput {
         };
     }
 
+    /**
+     * Wyświetla okno wyboru rozwijalnego ({@link ChoiceDialog}) z dostępnymi kryteriami sortowania słów.
+     *
+     * @return wybrana wartość wyliczeniowa {@link WordSort} (domyślnie {@code FREQUENCY_DESC})
+     */
     @Override
     public WordSort askSortMode() {
         List<String> choices = List.of(
@@ -123,11 +172,24 @@ public class FxUserInput extends UserInput {
         };
     }
 
+    /**
+     * Pobiera od użytkownika ścieżkę wyjściową dla pliku raportu z domyślną nazwą pliku.
+     *
+     * @param defaultFileName proponowana, domyślna nazwa pliku
+     * @return ścieżka {@link Path} do pliku w katalogu {@code output/}
+     */
     @Override
     public Path askOutputPath(String defaultFileName) {
         return askOutputPath(defaultFileName, null);
     }
 
+    /**
+     * Pobiera od użytkownika ścieżkę wyjściową dla pliku raportu z uwzględnieniem wybranego formatu.
+     *
+     * @param defaultFileName proponowana, domyślna nazwa pliku
+     * @param format          format raportu do automatycznego dopasowania rozszerzenia (może być {@code null})
+     * @return ścieżka {@link Path} do pliku w katalogu {@code output/}
+     */
     public Path askOutputPath(String defaultFileName, ReportWriter.Format format) {
         String suggestedName = defaultFileName;
         if (format != null) {
@@ -147,6 +209,14 @@ public class FxUserInput extends UserInput {
         return Path.of("output", finalName);
     }
 
+    /**
+     * Rozstrzyga ostateczną nazwę pliku, zapewniając odpowiednie rozszerzenie.
+     *
+     * @param name            nazwa wprowadzona przez użytkownika
+     * @param defaultFileName domyślna nazwa zastępcza
+     * @param format          wybrany format wyjściowy
+     * @return kompletna nazwa pliku wraz z rozszerzeniem
+     */
     private String resolveFileName(String name, String defaultFileName, ReportWriter.Format format) {
         if (name.isEmpty()) {
             return defaultFileName;
@@ -160,6 +230,13 @@ public class FxUserInput extends UserInput {
         return name + defaultExtension(defaultFileName);
     }
 
+    /**
+     * Zapewnia, że proponowana nazwa pliku posiada rozszerzenie zgodne z formatem.
+     *
+     * @param fileName nazwa pliku wejściowa
+     * @param format   format wyjściowy
+     * @return nazwa pliku z odpowiednim rozszerzeniem
+     */
     private String ensureExtension(String fileName, ReportWriter.Format format) {
         String extension = extensionFor(format);
         if (fileName == null || fileName.isBlank()) {
@@ -173,6 +250,12 @@ public class FxUserInput extends UserInput {
         return fileName + extension;
     }
 
+    /**
+     * Zwraca rozszerzenie pliku odpowiadające danemu formatowi raportu.
+     *
+     * @param format format raportu
+     * @return ciąg znaków z rozszerzeniem (np. {@code .csv})
+     */
     private String extensionFor(ReportWriter.Format format) {
         return switch (format) {
             case CSV -> ".csv";
@@ -182,11 +265,23 @@ public class FxUserInput extends UserInput {
         };
     }
 
+    /**
+     * Wyodrębnia domyślne rozszerzenie z podanej nazwy pliku.
+     *
+     * @param defaultFileName domyślna nazwa pliku
+     * @return odnalezione rozszerzenie lub {@code .txt}, jeśli brak kropki
+     */
     private String defaultExtension(String defaultFileName) {
         int idx = defaultFileName.lastIndexOf('.');
         return idx >= 0 ? defaultFileName.substring(idx) : ".txt";
     }
 
+    /**
+     * Sprawdza, czy podana nazwa pliku kończy się jednym ze wspieranych rozszerzeń (.txt, .csv, .json, .xml).
+     *
+     * @param fileName nazwa pliku do weryfikacji
+     * @return {@code true}, jeśli nazwa posiada akceptowalne rozszerzenie; w przeciwnym razie {@code false}
+     */
     private boolean hasValidExtension(String fileName) {
         String lower = fileName.toLowerCase(Locale.ROOT);
         return lower.endsWith(".csv")

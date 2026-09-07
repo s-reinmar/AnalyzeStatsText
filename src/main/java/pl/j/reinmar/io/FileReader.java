@@ -6,12 +6,31 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+/**
+ * Klasa narzędziowa odpowiedzialna za odczyt plików z zasobów aplikacji (classpath).
+ * <p>
+ * Dostarcza statyczne metody pomocnicze pozwalające na łatwe wczytywanie zawartości
+ * plików tekstowych do ciągów znaków ({@link String}) z wykorzystaniem kodowania UTF-8.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
+ */
 public class FileReader {
 
     /**
-     * Odczytuje plik tekstowy z katalogu zasobów (Resources), zwraca jego zawartość jako ciąg znaków (String) z UTF-8
-     * @param path nazwa pliku w zasobach (np. "file.txt")
-     * @return zawartość pliku jako String
+     * Prywatny konstruktor zapobiegający tworzeniu instancji klasy narzędziowej.
+     */
+    private FileReader() {
+    }
+
+    /**
+     * Wczytuje plik z zasobów aplikacji (classpath) i zwraca jego zawartość jako ciąg znaków w kodowaniu UTF-8.
+     *
+     * @param path ścieżka do pliku zasobu względem katalogu zasobów (np. {@code "texts/file.txt"})
+     * @return zawartość pliku w postaci ciągu znaków {@link String}
+     * @throws RuntimeException jeśli zasób nie zostanie odnaleziony w classpath lub wystąpi błąd odczytu I/O
+     * @throws IOException      jeśli wystąpi błąd podczas zamykania strumienia wejściowego
      */
     public static String readResource(String path) throws IOException {
 

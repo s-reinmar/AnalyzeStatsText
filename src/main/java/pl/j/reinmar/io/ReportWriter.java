@@ -10,29 +10,48 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+
 /**
- * Klasa odpowiedzialna za zapis gotowych raportów do plików.
- * Nie analizuje tekstu i nie buduje treści raportu — jedynie
- * deleguje formatowanie do odpowiedniego Formattera oraz
- * zapisuje wynik na dysku.
+ * Klasa odpowiedzialna za generowanie i zapisywanie raportów do plików na dysku.
+ * <p>
+ * Odpowiada za dobór odpowiedniego formatera ({@link Formatter}), zbudowanie zawartości
+ * raportu poprzez {@link ReportBuilder} oraz fizyczny zapis wygenerowanego ciągu znaków do wskazanego pliku.
+ * </p>
+ *
+ * @author Sławek Reinmar
+ * @version 1.0
  */
 public class ReportWriter {
 
     /**
-     * Obsługiwane formaty raportów.
+     * Domyślny konstruktor klasy zapisującej raporty.
      */
-    public enum Format {
-        CSV, TXT, JSON, XML
+    public ReportWriter() {
     }
 
     /**
-     * Zapisuje raport do pliku.
+     * Dostępne formaty wyjściowe plików raportów.
+     */
+    public enum Format {
+        /** Format wartości rozdzielanych przecinkami (CSV). */
+        CSV,
+        /** Format czystego tekstu (TXT). */
+        TXT,
+        /** Format strukturalny JSON. */
+        JSON,
+        /** Format strukturalny XML. */
+        XML
+    }
+
+    /**
+     * Generuje treść raportu w wybranym formacie i zapisuje go pod wskazaną ścieżką.
      *
-     * @param outputPath ścieżka docelowa
-     * @param type       typ raportu (BASIC, FULL, FREQUENCY)
-     * @param stats      statystyki tekstu
-     * @param freq       mapa częstotliwości słów
-     * @param format     format raportu
+     * @param outputPath ścieżka docelowa {@link Path} dla pliku raportu
+     * @param type       typ i zakres generowanego raportu ({@link ReportType})
+     * @param stats      podstawowe statystyki ilościowe tekstu ({@link TextStats})
+     * @param freq       mapa częstotliwości występowania słów
+     * @param format     format wyjściowy raportu ({@link Format})
+     * @throws RuntimeException jeśli wystąpi błąd podczas budowania lub zapisu raportu
      */
     public static void writeReport(Path outputPath,
                                    ReportType type,
@@ -58,7 +77,10 @@ public class ReportWriter {
     }
 
     /**
-     * Zwraca odpowiedni formatter na podstawie formatu.
+     * Zwraca odpowiednią instancję formatera ({@link Formatter}) dla wskazanego formatu wyjściowego.
+     *
+     * @param format żądany format wyjściowy ({@link Format})
+     * @return instancja odpowiedniej klasy implementującej {@link Formatter}
      */
     public static Formatter formatter(Format format) {
         return switch (format) {
@@ -70,7 +92,11 @@ public class ReportWriter {
     }
 
     /**
-     * Zapisuje treść do pliku, tworząc katalogi jeśli trzeba.
+     * Tworzy niezbędne katalogi nadrzędne i zapisuje podany ciąg znaków do pliku w kodowaniu UTF-8.
+     *
+     * @param path    ścieżka docelowa {@link Path} do pliku
+     * @param content zawartość tekstowa do zapisania
+     * @throws IOException jeśli wystąpi błąd wejścia/wyjścia podczas tworzenia katalogów lub zapisu pliku
      */
     public static void write(Path path, String content) throws IOException {
         Files.createDirectories(path.getParent());

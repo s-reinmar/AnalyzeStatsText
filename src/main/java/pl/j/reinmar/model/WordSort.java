@@ -1,23 +1,25 @@
 package pl.j.reinmar.model;
 
-
-// plik: model/WordSort.java
-
 import java.text.Collator;
 import java.util.Comparator;
 import java.util.Locale;
 
 /**
- * Strategia sortowania dla listy WordCount.
- * Używa Collatora dla polskiej lokalizacji (pl-PL).
+ * Określa kryteria sortowania zestawień słów i ich częstotliwości.
+ * <p>
+ * Typ wyliczeniowy udostępnia dedykowany {@link Comparator} dla obiektów {@link WordCount},
+ * wykorzystując polski {@link Collator} w celu poprawnej obsługi polskich znaków diakrytycznych
+ * podczas porównań alfabetycznych.
+ * </p>
  *
- * Collator.PRIMARY ignoruje wielkość liter i akcenty.
- * Jeśli potrzebujesz pełnego rozróżnienia (case-sensitive + diakrytyki),
- * zmień na Collator.TERTIARY.
+ * @author Sławek Reinmar
+ * @version 1.0
  */
 public enum WordSort {
 
-    /** Alfabetycznie wg polskiego Collatora. */
+    /**
+     * Sortowanie alfabetyczne według polskiego {@link Collator} (od A do Z).
+     */
     ALPHABETIC {
         @Override
         public Comparator<WordCount> comparator() {
@@ -26,7 +28,10 @@ public enum WordSort {
         }
     },
 
-    /** Najpierw liczba wystąpień malejąco, przy remisie alfabetycznie. */
+    /**
+     * Sortowanie według liczby wystąpień malejąco. Przy jednakowej liczbie wystąpień
+     * decyduje kolejność alfabetyczna.
+     */
     FREQUENCY_DESC {
         @Override
         public Comparator<WordCount> comparator() {
@@ -38,7 +43,10 @@ public enum WordSort {
         }
     },
 
-    /** Najpierw liczba wystąpień rosnąco, przy remisie alfabetycznie. */
+    /**
+     * Sortowanie według liczby wystąpień rosnąco. Przy jednakowej liczbie wystąpień
+     * decyduje kolejność alfabetyczna.
+     */
     FREQUENCY_ASC {
         @Override
         public Comparator<WordCount> comparator() {
@@ -50,10 +58,19 @@ public enum WordSort {
         }
     };
 
-    /** Zwraca komparator dla danego trybu sortowania. */
+    /**
+     * Zwraca komparator obiektów {@link WordCount} odpowiadający wybranemu trybowi sortowania.
+     *
+     * @return instancja {@link Comparator} dopasowana do danego wariantu sortowania
+     */
     public abstract Comparator<WordCount> comparator();
 
-    // ===== Pomocnicze: Collator dla PL =====
+    /**
+     * Tworzy i konfiguruje komparator ciągów znaków uwzględniający reguły języka polskiego.
+     *
+     * @param strength poziom dokładności porównywania w obiekcie {@link Collator} (np. {@link Collator#PRIMARY})
+     * @return komparator ciągów znaków dopasowany do polskiej lokalizacji
+     */
     private static Comparator<String> localeStringComparator(int strength) {
         Collator collator = Collator.getInstance(new Locale("pl", "PL"));
         collator.setStrength(strength); // PRIMARY: ignoruje case/akcenty; TERTIARY: pełne rozróżnienie
